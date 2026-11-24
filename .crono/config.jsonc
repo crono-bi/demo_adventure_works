@@ -1,0 +1,31 @@
+﻿{
+  "etl-options": {
+    "inserted-date-column-name": "insert_date",
+    "updated-date-column-name": "update_date",
+    "deleted-date-column-name": "delete_date",
+    "start-date-column-name": "start_date",
+    "end-date-column-name": "end_date",
+    "default-end-date": "2100-01-01",
+    "create-procedure-extended-properties": true
+  },
+  "special-tables": {
+    "logs-table": {
+      "schema-name": "audit",
+      "table-name": "logs",
+      "id-column": "id",
+      "parent-id-column": "parent_id",
+      "root-id-column": "root_id",
+      "start-date-column": "start_date",
+      "end-date-column": "end_date",
+      "description-column": "description",
+      "rows-count-column": "rows_count",
+      "error-message-column": "error_message",
+      "user-column": "user",
+      "spid-column": "spid"
+    }
+  },
+  "calendas": {
+    "calendas-id": null,
+    "calendas-token": null
+  }
+}

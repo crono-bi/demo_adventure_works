@@ -1,0 +1,20 @@
+﻿{
+  "name": "Default",
+  "default-connection": null,
+  "Connections": [
+    {
+      "type": "sqlserver",
+      "server": ".",
+      "database-name": "CRONO_ADVENTURE_WORKS",
+      "username": null,
+      "password": null,
+      "name": "LOCAL"
+    }
+  ],
+  "replacements": [
+    {
+      "key": "@@erp",
+      "value": "[adventureworks.dwh.es].AdventureWorks2016.staging"
+    }
+  ]
+}
