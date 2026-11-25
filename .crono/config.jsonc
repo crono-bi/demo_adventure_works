@@ -22,10 +22,18 @@
       "error-message-column": "error_message",
       "user-column": "user",
       "spid-column": "spid"
-    }
+    },
+    "users-table": null,
+    "user-groups-table": null,
+    "memberships-table": null
   },
   "calendas": {
     "calendas-id": null,
     "calendas-token": null
-  }
+  },
+  "declaration-locations": null,
+  "exclude": [
+    "docs",
+    "scratch"
+  ]
 }

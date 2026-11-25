@@ -1,0 +1,3 @@
+# Test and exploration queries: not part of the project (see scratch/README.md)
+scratch/*
+!scratch/README.md

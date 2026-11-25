@@ -39,6 +39,6 @@ select
 	iso_week_number,
 	iso_week_year,
 	iso_week
-from Crono$Dates
+from crono.dates
 where [year] between 2010 and year(getdate())
 
