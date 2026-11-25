@@ -1,6 +1,7 @@
 ﻿
 
 WORKFLOW 'load_datawarehouse' (
+	FILE '\jobs\import-all-parquets.job',
 	dwh.dim_dates,
 	dwh.dim_employees,
 	dwh.dim_products,
