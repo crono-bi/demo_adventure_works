@@ -1,4 +1,30 @@
-﻿
+﻿---
+Description: |
+  Dimensión de clientes de AdventureWorks. Una fila por cliente (Customer) del ERP.
+  Un cliente es una persona que compra online o una tienda (Store) que compra a través de un comercial.
+  Incluye la dirección particular de la persona (tipo de dirección 2, Home), el territorio de ventas
+  y los datos de la tienda (dirección de tipo 3, Main Office). La carga es MERGE UPSERT: los clientes
+  que desaparecen del ERP no se borran.
+Columns:
+  customer_sid: Clave subrogada del cliente en el DWH.
+  customer_id: Identificador del cliente en el ERP (Customer.CustomerID). Clave de negocio.
+  customer: Nombre y apellidos de la persona del cliente.
+  customer_type: "'Online' si el cliente no tiene tienda asociada; 'Store' si es una tienda."
+  account_number: Número de cuenta del cliente en el ERP (p. ej. AW00011000).
+  first_name: Nombre de la persona del cliente.
+  middle_name: Segundo nombre o inicial de la persona del cliente.
+  last_name: Apellidos de la persona del cliente.
+  customer_address_country: País de la dirección particular (Home) de la persona del cliente.
+  customer_province: Provincia o estado de la dirección particular (Home) de la persona del cliente.
+  customer_territory: Territorio de ventas al que está asignado el cliente.
+  customer_country: País del territorio de ventas del cliente. Puede no coincidir con customer_address_country.
+  store: "Nombre de la tienda del cliente; 'Online' si el cliente no es una tienda."
+  store_manager: Nombre y apellidos del comercial (SalesPerson) asignado a la tienda.
+  store_country: País de la dirección principal (Main Office) de la tienda.
+  store_province: Provincia o estado de la dirección principal (Main Office) de la tienda.
+  store_city: Ciudad de la dirección principal (Main Office) de la tienda.
+---
+
 CREATE OR REPLACE PROCEDURE
 MERGE UPSERT dwh.dim_customers(customer_sid)
 MATERIALIZE

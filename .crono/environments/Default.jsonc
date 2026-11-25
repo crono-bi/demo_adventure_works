@@ -1,7 +1,7 @@
 ﻿{
   "name": "Default",
   "default-connection": null,
-  "Connections": [
+  "connections": [
     {
       "type": "sqlserver",
       "server": ".",
@@ -16,5 +16,7 @@
       "key": "@@erp",
       "value": "[adventureworks.dwh.es].AdventureWorks2016.staging"
     }
-  ]
+  ],
+  "file-stores": [],
+  "credentials": []
 }
