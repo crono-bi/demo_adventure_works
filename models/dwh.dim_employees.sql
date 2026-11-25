@@ -1,37 +1,46 @@
 ﻿---
 Description: |
-  Dimensión de empleados de AdventureWorks. Una fila por empleado (Employee) del ERP,
-  incluidos los que ya no trabajan en la empresa (current_flag = 0).
+  Dimensión de empleados (comerciales) de Northwind. Una fila por empleado de staging.employees.
+  Desnormaliza el nombre de su jefe y la región de ventas de sus territorios.
 Columns:
   employee_sid: Clave subrogada del empleado en el DWH.
-  employee_id: Identificador del empleado en el ERP (Employee.BusinessEntityID). Clave de negocio.
-  national_id_number: Número de identificación nacional del empleado.
-  login_id: Usuario de red del empleado (p. ej. adventure-works\ken0).
-  job_title: Puesto de trabajo.
+  employee_id: Identificador del empleado en el origen. Clave de negocio.
+  employee: Nombre y apellidos del empleado.
+  title: Puesto de trabajo (p. ej. Sales Representative).
   birth_date: Fecha de nacimiento.
-  marital_status: "Estado civil: M (casado) o S (soltero)."
-  gender: "Sexo: M (hombre) o F (mujer)."
   hire_date: Fecha de contratación.
-  salaried_flag: "1 si el empleado es asalariado (sin horas extra); 0 si cobra por horas."
-  vacation_hours: Horas de vacaciones disponibles.
-  sick_leave_hours: Horas de baja por enfermedad disponibles.
-  current_flag: "1 si el empleado está activo; 0 si ya no trabaja en la empresa."
+  age_at_hire: Edad, en años cumplidos, el día de su contratación.
+  city: Ciudad del empleado.
+  country: País del empleado.
+  manager: Nombre y apellidos del jefe directo. Vacío si no tiene jefe.
+  sales_region: Región de ventas de los territorios que tiene asignados (Eastern, Western, Northern, Southern).
+  territories_count: Número de territorios que tiene asignados.
 ---
 
-CREATE OR  REPLACE PROCEDURE
-MERGE CLONE dwh.dim_employees(employee_sid)
-select
-	BusinessEntityID			#employee_id int NOT NULL,
-	NationalIDNumber			national_id_number,
-	LoginID						login_id,
-	JobTitle					job_title,
-	BirthDate					birth_date,
-	MaritalStatus				marital_status NULL,
-	Gender						gender,
-	HireDate					hire_date,
-	SalariedFlag				salaried_flag,
-	VacationHours				vacation_hours,
-	SickLeaveHours				sick_leave_hours,
-	CurrentFlag					current_flag
-from @@erp.Employee
-
+CREATE OR REPLACE PROCEDURE
+MERGE CLONE dwh.dim_employees(employee_sid) KEY (employee_id)
+SELECT
+	employees.employee_id									employee_id,
+	concat(employees.first_name, ' ', employees.last_name)	employee,
+	employees.title											title,
+	date(employees.birth_date)								birth_date,
+	date(employees.hire_date)								hire_date,
+	floor(days_between(employees.birth_date, employees.hire_date) / 365.25)	age_at_hire,
+	employees.city											city,
+	employees.country										country,
+	concat(managers.first_name, ' ', managers.last_name)	manager,
+	employee_regions.sales_region							sales_region,
+	employee_regions.territories_count						territories_count
+FROM staging.employees
+LEFT JOIN staging.employees managers USING employees(reports_to employee_id)
+LEFT JOIN (
+	SELECT
+		employee_territories.employee_id,
+		min(trim(region.region_description))	sales_region,
+		count(*)								territories_count
+	FROM staging.employee_territories
+	INNER JOIN staging.territories USING employee_territories(territory_id)
+	INNER JOIN staging.region USING territories(region_id)
+	GROUP BY employee_territories.employee_id
+) employee_regions USING employees(employee_id)
+CHECK SNOWFLAKE

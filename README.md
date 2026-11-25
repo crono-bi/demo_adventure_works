@@ -1,6 +1,6 @@
 # WELCOME
 
-This is a [Crono ETL](https://dev.crono.org/etl/project-structure/) project: a demo data warehouse built on the AdventureWorks database. The models in `models/` define the `dwh` tables (dimensions and facts) and their load procedures, and `jobs/load_datawarehouse.job` loads them in order.
+This is a [Crono ETL](https://dev.crono.org/etl/project-structure/) project: a demo data warehouse built on the Northwind sample database. `jobs/load_datawarehouse.job` first imports the Northwind parquet files in `seeds/northwind_sample/` into the `staging` schema, then loads the `dwh` tables (dimensions and facts) defined in `models/`.
 
 A Crono ETL project is just a folder of text files, so you can work on it with any of these:
 

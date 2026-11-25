@@ -1,54 +1,47 @@
-﻿---
+---
 Description: |
-  Dimensión de productos de AdventureWorks. Una fila por producto (Product) del ERP, con su
-  subcategoría, categoría y modelo. Los productos sin subcategoría (componentes y material
-  que no se vende) tienen la categoría y la subcategoría vacías. La carga es MERGE UPSERT:
-  los productos que desaparecen del ERP no se borran.
+  Dimensión de productos de Northwind. Una fila por producto de staging.products.
+  Desnormaliza su categoría y su proveedor, y calcula el estado del stock.
+  La carga es MERGE UPSERT: los productos que desaparecen del origen no se borran.
 Columns:
   product_sid: Clave subrogada del producto en el DWH.
-  product_id: Identificador del producto en el ERP (Product.ProductID). Clave de negocio.
+  product_id: Identificador del producto en el origen. Clave de negocio.
   product: Nombre del producto.
-  product_category: Categoría del producto (Bikes, Components, Clothing, Accessories).
-  product_subcategory: Subcategoría del producto (p. ej. Mountain Bikes).
-  product_number: Código del producto (p. ej. BK-M68B-38).
-  product_model: Modelo del producto.
-  color: Color del producto.
-  standard_cost: Coste estándar del producto, en USD.
-  list_price: Precio de venta de tarifa, en USD.
-  size: Talla o tamaño del producto.
-  size_unit_measure_code: Unidad de medida de size (p. ej. CM).
-  weight: Peso del producto.
-  weight_unit_measure_code: Unidad de medida de weight (p. ej. LB, G).
-  product_line: "Línea de producto: R (carretera), M (montaña), T (paseo) o S (estándar)."
-  discontinued_date: Fecha en la que el producto dejó de fabricarse o venderse.
-  make_flag: "1 si el producto se fabrica en la empresa; 0 si se compra."
-  finished_goods_flag: "1 si el producto es vendible (producto terminado); 0 si no."
+  category: Categoría del producto (p. ej. Beverages, Seafood).
+  supplier: Nombre de la empresa proveedora.
+  supplier_country: País del proveedor.
+  quantity_per_unit: Formato de venta (p. ej. 10 boxes x 20 bags).
+  list_price: Precio de tarifa actual del producto.
+  units_in_stock: Unidades en almacén.
+  units_on_order: Unidades pedidas al proveedor y pendientes de recibir.
+  reorder_level: Nivel de stock por debajo del cual hay que volver a pedir.
+  discontinued: "1 si el producto está descatalogado; 0 si no."
+  stock_status: |
+    Estado del stock: Discontinued (descatalogado), Out of stock (sin unidades),
+    Reorder (el stock más lo pedido no llega al nivel de pedido) u OK.
 ---
 
 CREATE OR REPLACE PROCEDURE
-MERGE UPSERT dwh.dim_products(product_sid)
-MATERIALIZE
-select
-	Product.ProductID			#product_id,
-	Product.Name				product,
-  	ProductCategory.name 		product_category,
-  	ProductSubCategory.name 	product_subcategory,
-	ProductNumber				product_number,
-	ProductModel.name 			product_model,
-  	Color						color,
-	StandardCost				standard_cost,
-	ListPrice					list_price,
-	Size						size,
-	SizeUnitMeasureCode			size_unit_measure_code,
-	Weight						weight,
-	WeightUnitMeasureCode		weight_unit_measure_code,
-	ProductLine					product_line,
-	DiscontinuedDate			discontinued_date,
-	MakeFlag					make_flag,
-	FinishedGoodsFlag			finished_goods_flag
-FROM @@erp.Product
-LEFT JOIN @@erp.ProductSubCategory using Product(ProductSubcategoryID)
-LEFT JOIN @@erp.ProductCategory using ProductSubCategory(ProductCategoryId)
-LEFT JOIN @@erp.ProductModel using Product(ProductModelID)
-check snowflake
-
+MERGE UPSERT dwh.dim_products(product_sid) KEY (product_id)
+SELECT
+	products.product_id				product_id,
+	products.product_name			product,
+	categories.category_name		category,
+	suppliers.company_name			supplier,
+	suppliers.country				supplier_country,
+	products.quantity_per_unit		quantity_per_unit,
+	products.unit_price				list_price,
+	products.units_in_stock			units_in_stock,
+	products.units_on_order			units_on_order,
+	products.reorder_level			reorder_level,
+	int(products.discontinued)		discontinued,
+	CASE
+		WHEN products.discontinued = 1 THEN 'Discontinued'
+		WHEN products.units_in_stock = 0 THEN 'Out of stock'
+		WHEN products.units_in_stock + products.units_on_order <= products.reorder_level THEN 'Reorder'
+		ELSE 'OK'
+	END								stock_status
+FROM staging.products
+LEFT JOIN staging.categories USING products(category_id)
+LEFT JOIN staging.suppliers USING products(supplier_id)
+CHECK SNOWFLAKE

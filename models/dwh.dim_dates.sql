@@ -1,7 +1,7 @@
 ﻿---
 Description: |
-  Dimensión de fechas (calendario). Una fila por día desde el 1 de enero de 2010 hasta el
-  31 de diciembre del año en curso, generada a partir de la vista Crono$Dates de Crono.
+  Dimensión de fechas (calendario). Una fila por día de 1996 a 1998, los años de los pedidos
+  de Northwind, generada a partir de la vista crono.dates de Crono.
   Los nombres de meses y días están en castellano.
 Columns:
   date: Día natural. Clave del calendario.
@@ -23,8 +23,8 @@ Columns:
 ---
 
 CREATE OR REPLACE PROCEDURE
-MERGE CLONE dwh.dim_dates KEY date
-select
+MERGE CLONE dwh.dim_dates KEY ([date])
+SELECT
 	[date] date date NOT NULL PRIMARY KEY,
 	iso_date,
 	year,
@@ -39,6 +39,8 @@ select
 	iso_week_number,
 	iso_week_year,
 	iso_week
-from crono.dates
-where [year] between 2010 and year(getdate())
+FROM crono.dates
+-- The years in the Northwind sample: orders go from 1996-07-04 to 1998-05-06 and the latest
+-- required date is 1998-06-11. Widen the range if the data in staging gets newer dates.
+WHERE [year] BETWEEN 1996 AND 1998
 

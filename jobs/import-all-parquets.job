@@ -1,12 +1,12 @@
 ﻿
--- Imports every parquet file in seeds/ (staging.<table>.parquet) into staging.<table>.
+-- Imports the Northwind sample parquet files in seeds/northwind_sample/ (staging.<table>.parquet) into staging.<table>.
 -- Each table is dropped and recreated on every run.
 [IMPORT PARQUET] (
 	clean_mode='Drop',
 	schema_name='staging',
 	[Data]=(
 		SELECT
-			concat('\seeds\staging.', t.[value], '.parquet')	source_location,
+			concat('\seeds\northwind_sample\staging.', t.[value], '.parquet')	source_location,
 			t.[value]											table_name
 		FROM crono.split_to_table(
 			'categories, 
