@@ -1,6 +1,6 @@
 ---
 Description: |
-  Hechos de líneas de pedido de Northwind. Una fila por línea de staging.order_details
+  Hechos de líneas de pedido de Northwind. Una fila por línea de @@stg.order_details
   (un producto de un pedido). Desnormaliza la fecha del pedido y calcula los importes
   bruto, de descuento y neto. Los datos del pedido están en dwh.fact_orders.
 Columns:
@@ -30,7 +30,7 @@ SELECT
 	round(order_details.unit_price * order_details.quantity, 2)
 		- round(order_details.unit_price * order_details.quantity * (1 - order_details.discount), 2)	discount_amount		decimal(12,2),
 	round(order_details.unit_price * order_details.quantity * (1 - order_details.discount), 2)	net_amount			decimal(12,2)
-FROM staging.order_details
+FROM @@stg.order_details
 INNER JOIN dwh.fact_orders USING order_details(order_id)
 INNER JOIN dwh.dim_products USING order_details(product_id)
 CHECK SNOWFLAKE

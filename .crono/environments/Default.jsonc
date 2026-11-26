@@ -1,6 +1,6 @@
 ﻿{
   "name": "Default",
-  "default-connection": null,
+  "default-connection": "LOCAL",
   "connections": [
     {
       "type": "sqlserver",
@@ -11,7 +11,12 @@
       "name": "LOCAL"
     }
   ],
-  "replacements": [],
+  "replacements": [
+    {
+      "key": "@@stg",
+      "value": "staging"
+    }
+  ],
   "file-stores": [],
   "credentials": []
 }

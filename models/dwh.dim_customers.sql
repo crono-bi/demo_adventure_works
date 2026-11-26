@@ -1,6 +1,6 @@
 ﻿---
 Description: |
-  Dimensión de clientes de Northwind. Una fila por cliente de staging.customers.
+  Dimensión de clientes de Northwind. Una fila por cliente de @@stg.customers.
   Añade el área de ventas (continente) a partir del país. La carga es MERGE UPSERT:
   los clientes que desaparecen del origen no se borran.
 Columns:
@@ -30,4 +30,4 @@ SELECT
 		WHEN customers.country IN ('Argentina', 'Brazil', 'Venezuela') THEN 'South America'
 		ELSE 'Europe'
 	END								sales_area
-FROM staging.customers
+FROM @@stg.customers

@@ -1,6 +1,6 @@
 ---
 Description: |
-  Dimensión de productos de Northwind. Una fila por producto de staging.products.
+  Dimensión de productos de Northwind. Una fila por producto de @@stg.products.
   Desnormaliza su categoría y su proveedor, y calcula el estado del stock.
   La carga es MERGE UPSERT: los productos que desaparecen del origen no se borran.
 Columns:
@@ -41,7 +41,7 @@ SELECT
 		WHEN products.units_in_stock + products.units_on_order <= products.reorder_level THEN 'Reorder'
 		ELSE 'OK'
 	END								stock_status
-FROM staging.products
-LEFT JOIN staging.categories USING products(category_id)
-LEFT JOIN staging.suppliers USING products(supplier_id)
+FROM @@stg.products
+LEFT JOIN @@stg.categories USING products(category_id)
+LEFT JOIN @@stg.suppliers USING products(supplier_id)
 CHECK SNOWFLAKE

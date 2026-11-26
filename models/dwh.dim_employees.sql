@@ -1,6 +1,6 @@
 ﻿---
 Description: |
-  Dimensión de empleados (comerciales) de Northwind. Una fila por empleado de staging.employees.
+  Dimensión de empleados (comerciales) de Northwind. Una fila por empleado de @@stg.employees.
   Desnormaliza el nombre de su jefe y la región de ventas de sus territorios.
 Columns:
   employee_sid: Clave subrogada del empleado en el DWH.
@@ -31,16 +31,16 @@ SELECT
 	concat(managers.first_name, ' ', managers.last_name)	manager,
 	employee_regions.sales_region							sales_region,
 	employee_regions.territories_count						territories_count
-FROM staging.employees
-LEFT JOIN staging.employees managers USING employees(reports_to employee_id)
+FROM @@stg.employees
+LEFT JOIN @@stg.employees managers USING employees(reports_to employee_id)
 LEFT JOIN (
 	SELECT
 		employee_territories.employee_id,
 		min(trim(region.region_description))	sales_region,
 		count(*)								territories_count
-	FROM staging.employee_territories
-	INNER JOIN staging.territories USING employee_territories(territory_id)
-	INNER JOIN staging.region USING territories(region_id)
+	FROM @@stg.employee_territories
+	INNER JOIN @@stg.territories USING employee_territories(territory_id)
+	INNER JOIN @@stg.region USING territories(region_id)
 	GROUP BY employee_territories.employee_id
 ) employee_regions USING employees(employee_id)
 CHECK SNOWFLAKE

@@ -1,6 +1,6 @@
 ---
 Description: |
-  Hechos de pedidos de Northwind. Una fila por pedido de staging.orders, con su cliente,
+  Hechos de pedidos de Northwind. Una fila por pedido de @@stg.orders, con su cliente,
   su comercial y sus fechas. Desnormaliza la empresa de transporte y los totales de sus
   líneas, y calcula los días de envío y si el pedido se envió tarde. Las líneas de cada
   pedido están en dwh.fact_order_details.
@@ -41,17 +41,17 @@ SELECT
 	orders.freight								freight,
 	order_totals.lines_count					lines_count,
 	order_totals.order_amount					order_amount		decimal(12,2)
-FROM staging.orders
+FROM @@stg.orders
 INNER JOIN dwh.dim_customers USING orders(customer_id)
 INNER JOIN dwh.dim_employees USING orders(employee_id)
-LEFT JOIN staging.shippers USING orders(ship_via shipper_id)
+LEFT JOIN @@stg.shippers USING orders(ship_via shipper_id)
 LEFT JOIN (
 	SELECT
 		order_id,
 		count(*)													lines_count,
 		-- Same rounding per line as net_amount in dwh.fact_order_details, so the totals match.
 		sum(round(unit_price * quantity * (1 - discount), 2))		order_amount
-	FROM staging.order_details
+	FROM @@stg.order_details
 	GROUP BY order_id
 ) order_totals USING orders(order_id)
 CHECK SNOWFLAKE
