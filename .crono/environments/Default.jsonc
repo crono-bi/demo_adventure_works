@@ -5,18 +5,13 @@
     {
       "type": "sqlserver",
       "server": ".",
-      "database-name": "CRONO_ADVENTURE_WORKS",
+      "database-name": "CRONO_NORTHWIND",
       "username": null,
       "password": null,
       "name": "LOCAL"
     }
   ],
-  "replacements": [
-    {
-      "key": "@@erp",
-      "value": "[adventureworks.dwh.es].AdventureWorks2016.staging"
-    }
-  ],
+  "replacements": [],
   "file-stores": [],
   "credentials": []
 }

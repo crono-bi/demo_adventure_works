@@ -1,10 +1,7 @@
 ﻿[CRONO ETL PROJECT] (
-  ExcludedFiles=(),
-  JobsFolderPath='jobs',
   MaxRows=100000,
   AllowSaveWithErrors=NO,
   TableFilter='*',
-  ProceduresViewMode='Workflow',
   IsProceduresViewVisible=YES,
   IsSourceViewVisible=YES,
   IsOthersViewVisible=NO,
